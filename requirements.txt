@@ -1,18 +1,7 @@
-# alabaster @ file:///home/ktietz/src/ci/alabaster_1611921544520/work
-anaconda-client==1.11.0
-anaconda-navigator==2.3.1
-# anaconda-project @ file:///C:/Windows/TEMP/abs_91fu4tfkih/croots/recipe/anaconda-project_1660339890874/work
-# anyio @ file:///C:/ci/anyio_1644481921011/work/dist
+
 appdirs==1.4.4
-# argon2-cffi @ file:///opt/conda/conda-bld/argon2-cffi_1645000214183/work
-# argon2-cffi-bindings @ file:///C:/ci/argon2-cffi-bindings_1644551690056/work
-# arrow @ file:///opt/conda/conda-bld/arrow_1649166651673/work
 asgiref==3.6.0
-# astroid @ file:///C:/Windows/TEMP/abs_b0dtxgpicv/croots/recipe/astroid_1659023126745/work
-# astropy @ file:///C:/ci/astropy_1657719656942/work
 atomicwrites==1.4.0
-# attrs @ file:///opt/conda/conda-bld/attrs_1642510447205/work
-# Automat @ file:///tmp/build/80754af9/automat_1600298431173/work
 autopep8==2.0.1
 backports.weakref==1.0.post1
 bkcharts==0.2
@@ -38,47 +27,31 @@ djangorestframework==3.14.0
 djongo==1.3.6
 dnspython==2.3.0
 et-xmlfile==1.1.0
-# fastjsonschema @ file:///C:/Users/B
 Flask==2.2.2
 fonttools==4.25.0
 fpdf==1.7.2
-# fsspec @ file:///C:/Windows/TEMP/abs_a2mhnomvfy/croots/recipe/fsspec_1659972224540/work
 future==0.18.3
-# gensim @ file:///C:/ci/gensim_1646825438310/work
 geocoder==1.38.1
-# glob2 @ file:///home/linux1/recipes/ci/glob2_1610991677669/work
-# greenlet @ file:///C:/ci/greenlet_1628888275363/work
 gunicorn==20.1.0
 idna==3.4
 inflection==0.5.1
 itsdangerous==2.1.2
 Jinja2==3.1.2
 llvmlite==0.38.0
-# locket @ file:///C:/ci/locket_1652904031364/work
 lxml==4.9.2
-# lz4 @ file:///C:/ci/lz4_1619516674350/work
-# Markdown @ file:///C:/ci/markdown_1614364082838/work
 MarkupSafe==2.1.2
-# matplotlib @ file:///C:e:///C:/ci/matplotlib-inline_1661915841596/work
 mccabe==0.6.1
-# menuinst @ file:///C:/Users/BUILDE~1/AppData/Local/Temp/abs_455sf5o0ct/croots/recipe/menuinst_1661805970842/work
-# mistune @ file:///C:/ci/mistune_1607359457024/work
 mkl-fft==1.3.1
-# mkl-random @ file:///C:/ci/mkl_random_1626186184308/work
 mkl-service==2.4.0
-# mock @ file:///tmp/build/80754af9/mock_1607622725907/work
 mpmath==1.2.1
 munkres==1.1.4
 mypy-extensions==0.4.3
 navigator-updater==0.3.0
 openpyxl==3.0.10
-# packaging @ file:///tmp
 patsy==0.5.2
 pdfrw==0.4
 pep8==1.7.1
-# pexpect @ file:///tmp/build/80754af9/pexpect_1605563209008/work
 phonenumbers==8.13.6
-# pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
 Pillow==9.4.0
 pyasn1-modules==0.2.8
 pycodestyle==2.10.0
