@@ -17,7 +17,7 @@ comtypes==1.1.10
 # conda-verify==3.4.2
 constantly==15.1.0
 cssselect==1.1.0
-daal4py==2021.6.0
+# daal4py==2021.6.0
 datashape==0.5.4
 Django==4.1.6
 django-cors-headers==3.13.0
