@@ -10,11 +10,27 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.http import HttpResponse
-
+import requests
+import os
+import torch
 import datetime
 import base64
 from io import BytesIO
 from PIL import Image
+# from django.core.paginator import Paginator
+
+# import boto3
+# Set up an S3 client
+# s3 = boto3.client(
+#     's3',
+#     aws_access_key_id='AKIAWRRRLNCH36OE4C6C',
+#     aws_secret_access_key='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',
+#     region_name='us-east-1'  # US East (N. Virginia) us-east-1
+# )
+
+
+model = torch.hub.load(
+    'yolov5', 'custom', path='yolov5/runs/train/exp/weights/best.pt', force_reload=True, source='local')
 
 
 class TrainingList(ListAPIView):
@@ -27,49 +43,68 @@ class TrainingList(ListAPIView):
 
     def post(self, request, *args, **kwargs):
         if request.method == 'POST':
-
-            trainingDataName = request.POST.get('Name')
-            trainingDataFrame = request.FILES.get('Frame')
-            trainingDataComment = request.POST.get('Comment')
-
+            # Get training data from form
+            training_data_name = request.POST.get('Name')
+            training_data_comment = request.POST.get('Comment')
             # from video capturing
+            frame_name = request.POST.get('frameName')
+            frame_type = request.POST.get('frameType')
+            frame_comment = request.POST.get('frameComment')
+            frame_image = request.POST.get('frameImage')
 
-            frameName = request.POST.get('frameName')
-            frameType = request.POST.get('frameType')
-            frameComment = request.POST.get('frameComment')
-            frameImage = request.POST.get('frameImage')
-            md = 0
-            ed = 0
-            mi = 0
-            print(frameType)
-            if frameType == 'Middle Ball':
+            # Get frame data from video capture
+            md, ed, mi = 0, 0, 0
+            if frame_type == 'Middle Ball':
                 md = 1
-            if frameType == 'Edge Ball':
+            elif frame_type == 'Edge Ball':
                 ed = 1
-            if frameType == 'Missed Ball':
+            elif frame_type == 'Missed Ball':
                 mi = 1
 
-            if trainingDataFrame:
-                trainingData = TrainingData(Name=trainingDataName, Frame=trainingDataFrame, Comment=trainingDataComment,
+            if 'Frame' in request.FILES:
+                im_bytes = request.FILES['Frame'].read()
+                timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+                filename_img = f'frame_{timestamp}.jpg'
+                im_file = BytesIO(im_bytes)
+                image = Image.open(im_file)
+                # image.save(filename_img)
+                image.filename = filename_img
+                results = model(image)
+                print("result is :"+str(results))
+                # results.save()
+                results.my_saver()
+
+                # bucket_name = 'fyp-aws'
+                # with open('runs/detect/exp/'+filename_img, 'rb') as f:
+                #     s3.upload_fileobj(f, bucket_name, 'runs/detect/exp/'+filename_img)
+
+                trainingData = TrainingData(Name=training_data_name, Frame=filename_img, Comment=training_data_comment,
                                             Middle=md, Edge=ed, Missed=mi)
                 trainingData.save()
 
-            if frameImage:
+            if 'frameImage' in request.POST:
                 # decode the base64 image data into bytes
                 # remove the "data:image/jpeg;base64," prefix
-                data = frameImage.split(',')[1]
+                data = frame_image.split(',')[1]
                 image_bytes = base64.b64decode(data)
                 image = Image.open(BytesIO(image_bytes))
                 # generate a new filename based on the current timestamp
                 timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-                filename = f'captured_frame_{timestamp}.jpg'
-
+                filename_vide_img = f'frame_{timestamp}.jpg'
                 # save the image to a file with the new filename
-                image.save(filename)
+                # image.save(filename_vide_img)
+                image.filename = filename_vide_img
+                results = model(image)
+                print("result is :"+str(results))
+                # results.save()
+                results.my_saver()
 
-                # create a new Frame object and save it to the database
-                frame_data = TrainingData(Name=frameName,
-                                          Comment=frameComment, Frame=filename, Middle=md, Edge=ed, Missed=mi)
+                # bucket_name = 'fyp-aws'
+                # with open('runs/detect/exp/'+filename_vide_img, 'rb') as f:
+                #     s3.upload_fileobj(f, bucket_name, 'runs/detect/exp/'+filename_vide_img)
+
+                frame_data = TrainingData(Name=frame_name,
+                                          Comment=frame_comment, Frame=filename_vide_img, Middle=md, Edge=ed, Missed=mi)
                 frame_data.save()
 
             return JsonResponse({'message': 'trainingData created successfully'})
@@ -91,32 +126,12 @@ class TrainingList(ListAPIView):
             print(item.Name)
             updateName = request.data.get('Name')
             updateComment = request.data.get('Comment')
-            # frameType = request.data.get('frameStatus')
-            # md = 0
-            # ed = 0
-            # mi = 0
-            # print(frameType)
-            # if frameType == 'Middle Ball':
-            #     md = 1
-            # if frameType == 'Edge Ball':
-            #     ed = 1
-            # if frameType == 'Missed Ball':
-            #     mi = 1
             updateMiddle = request.data.get('Middle')
             updateMissed = request.data.get('Missed')
             updateEdge = request.data.get('Edge')
-            # if updateMiddle == 1:
-            #     updateMissed = 0
-            #     updateEdge = 0
-            # elif updateMissed == 1:
-            #     updateMiddle = 0
-            #     updateEdge = 0
-            # elif updateEdge == 1:
-            #     updateMissed = 0
-            #     updateMiddle = 0
 
             print(updateName)
-            if updateName:
+            if item_id:
                 item.Name = updateName
                 item.Comment = updateComment
                 item.Middle = updateMiddle
@@ -126,46 +141,3 @@ class TrainingList(ListAPIView):
                 return JsonResponse({'message': 'Data updated successfully'})
             else:
                 return JsonResponse({'error': 'Please provide a student name'})
-
-
-# def delete_record(request, idDelete):
-#     # if request.method=='DELETE':
-#     item_id = int(idDelete)
-#     try:
-#         item = TrainingData.objects.get(id=item_id)
-#     except TrainingData.DoesNotExist:
-#         return JsonResponse({'message': 'Item deleted errors'})
-#     item.delete()
-#     # return redirect('http://localhost:3000/BackendViewData')
-#     return JsonResponse({'message': 'Item deleted successfully'})
-
-
-# data = json.loads(request.body)
-    # Name = data['Name']
-    # Comment = data['Comment']
-    # Frame = data['Frame']
-    # Middle = data['Middle']
-    # Edge = data['Edge']
-    # Missed = data['Missed']
-    # training_data = TrainingData(
-    # Name=Name,
-    # Comment=Comment,
-    # Frame=Frame,
-    # Middle=Middle,
-    # Edge=Edge,
-    # Missed=Missed
-    # )
-    # training_data.save()
-
-    # body = json.loads(request.body.decode('utf-8'))
-    # print(body.get('Name'))
-    # print(request.POST.get('Frame'))
-    # trainingDataName =  body.get('Name')
-    # trainingDataFrame = request.FILES.get('Frame')
-    # trainingDataComment =  body.get('Comment')
-    # trainingDataMiddle =  body.get('Middle')
-    # trainingDataEdge =  body.get('Edge')
-    # trainingDataMissed=  body.get('Missed')
-
-    # print("name "+str(trainingDataName))
-    # print(trainingDataFrame)
